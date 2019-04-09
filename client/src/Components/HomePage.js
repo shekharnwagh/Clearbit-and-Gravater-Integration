@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import extractDomain from 'extract-domain';
+import Url from 'url-parse';
+const crypto = require('crypto');
 
 class HomePage extends Component {
   constructor(props) {
@@ -6,15 +9,16 @@ class HomePage extends Component {
     this.state = {
       inputString: '',
       type: '',
-      valid: false
+      valid: false,
+      requestUrl: ''
     };
   }
 
   validateInput = input => {
     let type = '', valid = false;
 
-    const mailReg = new RegExp("^(?=[A-Z0-9][A-Z0-9@._%+-]{5,253}$)[A-Z0-9._%+-]{1,64}@(?:(?=[A-Z0-9-]{1,63}\.)[A-Z0-9]+(?:-[A-Z0-9]+)*\.){1,8}[A-Z]{2,63}$", "i");
-    const urlReg = new RegExp("^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\\-\\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$", "i");
+    const mailReg = /^(?=[A-Z0-9][A-Z0-9@._%+-]{5,253}$)[A-Z0-9._%+-]{1,64}@(?:(?=[A-Z0-9-]{1,63}\.)[A-Z0-9]+(?:-[A-Z0-9]+)*\.){1,8}[A-Z]{2,63}$/i;
+    const urlReg = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/i;
 
     if (mailReg.test(input)) {
       type = 'mail';
@@ -28,6 +32,17 @@ class HomePage extends Component {
     return { type, valid };
   }
 
+  generateMailLink = str => {
+    const hash = crypto.createHash('md5').update(str).digest('hex');
+    return `https://www.gravatar.com/avatar/${hash}`;
+  }
+
+  generateUrlLink = str => {
+    const urlObj = new Url(str);
+    const domain = extractDomain(urlObj.href);
+    return `https://logo.clearbit.com/${domain}`;
+  }
+
   handleChange = event => {
     const validation = this.validateInput(event.target.value);
     this.setState({
@@ -39,20 +54,65 @@ class HomePage extends Component {
   };
 
   onSubmit = event => {
-    console.log(`--------> ${this.state.inputString}`)
+    let requestUrl = '';
+    if (this.state.valid) {
+      if (this.state.type === 'mail') {
+        requestUrl = this.generateMailLink(this.state.inputString);
+      }
+      else if (this.state.type === 'url') {
+        requestUrl = this.generateUrlLink(this.state.inputString);
+      }
+      this.setState({
+        ...this.state,
+        requestUrl
+      });
+    }
+    else {
+      this.setState({
+        ...this.state,
+        requestUrl
+      }, () => {
+        alert('Invalid Input');
+      });
+    }
   }
 
   render() {
+    console.log('-----> Rendering')
+    const card = () => {
+      console.log('--------> Strting CARD');
+      console.log(`--------> Condition : ${this.state.valid}`)
+      if (this.state.valid) {
+        console.log('---------> IFF')
+        return (
+          <div className='card'>
+            <div className='row card-body'>
+              <img 
+                className='col-md-4'
+                src={this.state.requestUrl}
+              >
+              </img>
+              <div className='col-md-8'>
+
+              </div>
+            </div>
+          </div>
+        );
+      }
+      else {
+        return;
+      }
+    }
     return (
       <div>
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-md-3">
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-md-3">
               <form>
-                <div class="form-group">
+                <div className="form-group">
                   <input 
                     type="text"
-                    class="form-control"
+                    className="form-control"
                     id="inputString"
                     placeholder="Please enter email or web address"
                     onChange={this.handleChange}
@@ -60,13 +120,19 @@ class HomePage extends Component {
                   </input>
                   <button
                     type="submit"
-                    class="btn btn-primary btn-block"
+                    className="btn btn-primary btn-block"
                     onClick={this.onSubmit}
                   >
                   Get Image
                   </button>
                 </div>
               </form>
+            </div>
+            <div className='col-md-8'>
+              {card}
+              <img 
+                src={this.state.requestUrl}
+              ></img>
             </div>
           </div>
         </div>
