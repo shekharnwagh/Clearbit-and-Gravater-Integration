@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import extractDomain from 'extract-domain';
 import Url from 'url-parse';
+import './style.css';
 const crypto = require('crypto');
 
 class HomePage extends Component {
@@ -10,7 +11,12 @@ class HomePage extends Component {
       inputString: '',
       type: '',
       valid: false,
-      requestUrl: ''
+      requestUrl: '',
+      prevState: {
+        inputString: '',
+        type: '',
+        valid: false,
+      }
     };
   }
 
@@ -38,9 +44,7 @@ class HomePage extends Component {
   }
 
   generateUrlLink = str => {
-    const urlObj = new Url(str);
-    const domain = extractDomain(urlObj.href);
-    return `https://logo.clearbit.com/${domain}`;
+    return `https://logo.clearbit.com/${str}`;
   }
 
   handleChange = event => {
@@ -55,6 +59,11 @@ class HomePage extends Component {
 
   onSubmit = event => {
     let requestUrl = '';
+    let prevState = {
+      inputString: '',
+      type: '',
+      valid: false,
+    }
     if (this.state.valid) {
       if (this.state.type === 'mail') {
         requestUrl = this.generateMailLink(this.state.inputString);
@@ -62,15 +71,22 @@ class HomePage extends Component {
       else if (this.state.type === 'url') {
         requestUrl = this.generateUrlLink(this.state.inputString);
       }
+      prevState = {
+        inputString: this.state.inputString,
+        type: this.state.type,
+        valid: this.state.valid
+      }
       this.setState({
         ...this.state,
-        requestUrl
+        requestUrl,
+        prevState
       });
     }
     else {
       this.setState({
         ...this.state,
-        requestUrl
+        requestUrl,
+        prevState
       }, () => {
         alert('Invalid Input');
       });
@@ -78,22 +94,40 @@ class HomePage extends Component {
   }
 
   render() {
-    console.log('-----> Rendering')
     const card = () => {
-      console.log('--------> Strting CARD');
-      console.log(`--------> Condition : ${this.state.valid}`)
-      if (this.state.valid) {
-        console.log('---------> IFF')
+      if (this.state.prevState.valid && this.state.requestUrl) {
         return (
-          <div className='card'>
+          <div 
+            className='card col-md-5'
+            style={{
+              height: '250px',
+              marginTop: '20px'
+            }}
+          >
             <div className='row card-body'>
               <img 
-                className='col-md-4'
+                className='col-md-5'
                 src={this.state.requestUrl}
+                style={{padding: '0px'}}
               >
               </img>
-              <div className='col-md-8'>
-
+              <div className='col-md-7 align-self-center'>
+                <h4 className='card-title'>
+                  Entered String
+                </h4>
+                <p className='card-text'>
+                  {this.state.prevState.inputString}
+                </p>
+                <h4 className='card-title'>
+                  Type
+                </h4>
+                <p className='card-text'>
+                  {
+                    this.state.prevState.type === 'mail' ?
+                    'Email Address' :
+                    'Website Domain'
+                  }
+                </p>
               </div>
             </div>
           </div>
@@ -103,16 +137,18 @@ class HomePage extends Component {
         return;
       }
     }
+
     return (
       <div>
         <div className="container-fluid">
-          <div className="row">
-            <div className="col-md-3">
+          <div className="row justify-content-md-center">
+            <div className="col-md-4">
               <form>
                 <div className="form-group">
                   <input 
                     type="text"
                     className="form-control"
+                    style={{marginTop: '100px'}}
                     id="inputString"
                     placeholder="Please enter email or web address"
                     onChange={this.handleChange}
@@ -121,6 +157,7 @@ class HomePage extends Component {
                   <button
                     type="submit"
                     className="btn btn-primary btn-block"
+                    style={{marginTop: '10px'}}
                     onClick={this.onSubmit}
                   >
                   Get Image
@@ -128,13 +165,10 @@ class HomePage extends Component {
                 </div>
               </form>
             </div>
-            <div className='col-md-8'>
-              {card}
-              <img 
-                src={this.state.requestUrl}
-              ></img>
-            </div>
           </div>
+          <div className='row justify-content-md-center'>
+              {card()}
+            </div>
         </div>
       </div>
     );
