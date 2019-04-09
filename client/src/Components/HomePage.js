@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import extractDomain from 'extract-domain';
-import Url from 'url-parse';
 import './style.css';
 const crypto = require('crypto');
 
