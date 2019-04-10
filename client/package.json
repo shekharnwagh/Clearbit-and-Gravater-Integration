@@ -2,11 +2,14 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "author": "Shekhar Wagh",
   "dependencies": {
+    "axios": "^0.18.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
-    "react-scripts": "2.1.8"
+    "react-scripts": "2.1.8",
+    "react-select": "^2.4.2"
   },
   "scripts": {
     "start": "react-scripts start",
