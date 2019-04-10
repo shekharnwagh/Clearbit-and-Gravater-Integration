@@ -91,25 +91,36 @@ class HomePage extends Component {
     }
   }
 
+  fallbackImage = () => {
+    const requestUrl = require('./not_available.png');
+    this.setState({
+      ...this.state,
+      requestUrl
+    });
+  }
+
   render() {
+    let requestUrl = this.state.requestUrl;
     const card = () => {
       if (this.state.prevState.valid && this.state.requestUrl) {
         return (
           <div 
-            className='card col-md-5'
+            className='card col-md-4'
             style={{
-              height: '250px',
               marginTop: '20px'
             }}
           >
             <div className='row card-body'>
+              <div className='col-md-4 square'>
               <img 
-                className='col-md-5'
-                src={this.state.requestUrl}
-                style={{padding: '0px'}}
+                className='img img-responsive full-width align-self-center'
+                src={requestUrl}
+                onError={this.fallbackImage}
               >
               </img>
-              <div className='col-md-7 align-self-center'>
+              </div>
+              
+              <div className='col-md-8 align-self-center'>
                 <h4 className='card-title'>
                   Entered String
                 </h4>
@@ -166,7 +177,7 @@ class HomePage extends Component {
           </div>
           <div className='row justify-content-md-center'>
               {card()}
-            </div>
+          </div>
         </div>
       </div>
     );

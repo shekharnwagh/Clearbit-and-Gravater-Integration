@@ -2,6 +2,13 @@
   margin: 10px;
 }
 
+.square {
+  position:relative;
+  overflow:hidden;
+  padding: 0px
+}
+
 img {
-  background-image: url('./not_available.png')
+  width: 100%;
+  padding: 0px
 }
